@@ -1,11 +1,12 @@
 import $ from 'jquery';
 import 'fullcalendar';
+var machine_names;
 
 $(function() {
 
-
   $.getJSON('http://localhost:3000/jobs/machines', function(machines){
       var dataList = document.getElementById('machinelist');
+      window.machine_names = machines;
       machines.forEach(function(item) {
         var option = document.createElement('option');
 
@@ -24,12 +25,17 @@ $(function() {
         valueChanged = true;
     }
     if (valueChanged) {
-        // E.g. one machine e.target.value = m1
-        //now change the calendar view to that machine
-        console.log(e.target.value)
-        $('#calendar').fullCalendar('option', 'events', 'http://localhost:3000/jobs/machine='+e.target.value);
-        $('#calendar').fullCalendar('render');
-        $('#calendar').fullCalendar('rerendevents');
+      console.log("value changed");
+      window.machine_names.forEach(function(machine) {
+        console.log(machine);
+        if(machine==e.target.value){
+          console.log(e.target.value)
+
+          $('#calendar').fullCalendar ('removeEvents');
+          $('#calendar').fullCalendar( 'addEventSource', "http://localhost:3000/jobs/machine="+e.target.value )
+          $('#calendar').fullCalendar('refetchEvents');
+        }
+      });
     }
 });
 
@@ -56,6 +62,6 @@ $(function() {
     navLinks: true, // can click day/week names to navigate views
     editable: true,
     eventLimit: true, // allow "more" link when too many events
-    events: 'http://localhost:3000/jobs/machine=m1'
+    events: ''
   })
 });
